@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<link href="JS/icon.css" rel="stylesheet" />
+<script src="JS/jquery.min.js"></script>
+<script src="JS/jquery.easyui.min.js"></script>
+<script>
+    var data1=[{    
+    "id":1,    
+    "text":"text1"   
+},{    
+    "id":2,    
+    "text":"text2"   
+},{    
+    "id":3,    
+    "text":"text3",    
+    "selected":true   
+},{    
+    "id":4,    
+    "text":"text4"   
+},{    
+    "id":5,    
+    "text":"text5"   
+}]  
+
+        $(function () {
+            $('input').combobox();
+        })
+</script>
+<table>
+    <tr>
+        <td>
+            <input id="cc" class="easyui-combobox" name="dept"
+                   data-options="valueField:'id',textField:'text',data:data1" />
+        </td>
+        <td>
+           <input class="easyui-switchbutton" data-options="onText:'Yes',offText:'No'"/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <input tabindex="2" />
+        </td>
+        <td><input tabindex="4" /></td>
+    </tr>
+</table>
