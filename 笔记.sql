@@ -123,3 +123,22 @@ SELECT event_time, action_id,succeeded, session_id,server_instance_name,
 session_server_principal_name,object_name, statement, file_name, audit_file_offset
 FROM sys.fn_get_audit_file 
 ('D:\SqlAudit\Audit-AuditTest_69EFF93F-B7CB-4454-AB9D-0B2383E70923_0_132631929123830000.sqlaudit',default,default)
+
+--表的主键不能重复不能为空就是数据的完整性
+--一般索引B+树根节点是存放在内存里，三层的B+树索引插入数据需要两次IO操作
+
+--参照完整性检查违约处理
+CREATE TABLE SC
+        (Sno   CHAR(9)  NOT NULL,
+         Cno   CHAR(4)  NOT NULL,
+         Grade  SMALLINT,
+         PRIMARY KEY(Sno,Cno), 				
+         FOREIGN KEY (Sno) REFERENCES Student(Sno) 
+		ON DELETE CASCADE     /*级联删除SC表中相应的元组*/
+                ON UPDATE CASCADE, /*级联更新SC表中相应的元组*/
+         FOREIGN KEY (Cno) REFERENCES Course(Cno) 	                    
+               ON DELETE NO ACTION 	
+               /*当删除course 表中的元组造成了与SC表不一致时拒绝删除*/
+               ON UPDATE CASCADE   
+      	/*当更新course表中的cno时，级联更新SC表中相应的元组*/
+        );
