@@ -91,3 +91,35 @@ GRANT ALL PRIVILEGES ON sc TO sqltest;
 GRANT UPDATE(Sname),SELECT ON student TO sqltest;--给予sqltest查询student和更新sname字段的权限
 REVOKE UPDATE(Sname) ON student FROM sqltest; --取消sqltest更新sname字段的权限，也可用TO
 REVOKE DELETE,SELECT ON student FROM PUBLIC --取消所有用户对student的删除权限
+
+--数据库审计，记录数据库操作
+-- 1、创建 Server Audit
+USE [master]
+CREATE SERVER AUDIT[Audit-AuditTest]
+TO FILE 
+(
+FILEPATH =N'D:\SqlAudit',
+MAXSIZE=1GB,
+MAX_ROLLOVER_FILES=10,--系统中最多保留10个文件
+RESERVE_DISK_SPACE=OFF --预先分配审核文件到MaxSize
+)
+WITH(
+QUEUE_DELAY=1000,--被强制审核的毫秒间隔
+ON_FAILURE=CONTINUE --审核写入数据失败时
+)
+alter server audit [Audit-AuditTest] with (state=on)
+--2，数据库审计
+USE [MyTest]
+CREATE DATABASE AUDIT SPECIFICATION[DB_AuditTest]
+FOR SERVER AUDIT [Audit-AuditTest]
+ADD (INSERT,UPDATE,DELETE ON OBJECT::[dbo].[student] BY [PUBLIC])
+WITH (STATE=ON)
+--AUDIT ALTER,UPDATE ON student
+--NOAUDIT ALTER,UPDATE ON student
+SELECT* FROM dbo.Student
+UPDATE dbo.Student SET Sname='刘M' WHERE Sno=3
+
+SELECT event_time, action_id,succeeded, session_id,server_instance_name, 
+session_server_principal_name,object_name, statement, file_name, audit_file_offset
+FROM sys.fn_get_audit_file 
+('D:\SqlAudit\Audit-AuditTest_69EFF93F-B7CB-4454-AB9D-0B2383E70923_0_132631929123830000.sqlaudit',default,default)
